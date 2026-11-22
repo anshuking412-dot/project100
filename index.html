@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project 100 | Limitless Mind</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#090909;color:#eee;
+  font-family:Arial,sans-serif
+}
+header{
+  text-align:center;padding:25px 15px;
+  background:linear-gradient(120deg,#200000,#080808);
+  border-bottom:2px solid #f22
+}
+header h1{color:#ff3333;margin:0}
+header p{color:#bbb}
+.layout{display:flex;min-height:100vh}
+.sidebar{
+  width:230px;padding:16px;background:#111;
+  border-right:1px solid #333
+}
+.sidebar h2{color:#f33}
+#nav{display:flex;flex-direction:column;gap:6px}
+button{
+  cursor:pointer;color:#eee;background:#1a1a1a;
+  border:1px solid #444;padding:12px;border-radius:8px
+}
+button:hover{background:#360000}
+.main{flex:1;padding:20px;min-width:0}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{
+  flex:1;min-width:110px;background:#151515;
+  border:1px solid #333;border-radius:10px;padding:15px
+}
+.stat strong{display:block;color:#f33;font-size:23px;margin-top:8px}
+.progress{height:12px;background:#222;border-radius:10px;margin:10px 0 25px}
+#bar{height:100%;width:0;background:#f22;border-radius:10px}
+.level{
+  padding:18px;background:#121212;border:1px solid #333;
+  border-radius:12px;margin-bottom:20px;scroll-margin-top:10px
+}
+.level h2{color:#ff3333}
+.level h3{margin-top:20px}
+.level p{color:#ccc;line-height:1.6}
+.mission{
+  display:flex;gap:10px;background:#1b1b1b;
+  padding:12px;margin:8px 0;border-radius:8px
+}
+.mission input{accent-color:red;transform:scale(1.2)}
+.locked{opacity:.55}
+.badge{color:#ff5555;font-weight:bold}
+.complete{background:#a00;border:0;margin-top:12px}
+.complete:disabled{background:#333;color:#888}
+footer{text-align:center;padding:20px;color:#888}
+
+@media(max-width:700px){
+ .layout{display:block}
+ .sidebar{width:100%;border-right:0;border-bottom:1px solid #333}
+ #nav{flex-direction:row;overflow-x:auto;padding-bottom:10px}
+ #nav button{min-width:100px;white-space:nowrap}
+ .main{padding:12px}
+ header h1{font-size:25px}
+ .level{padding:14px}
+ .stat{padding:10px}
+}
+</style>
+</head>
+
+<body>
+<header>
+<h1>🔥 PROJECT 100</h1>
+<p>Build Your Mind • Build Your Knowledge • Build Your Future</p>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+<h2>LEVEL MAP</h2>
+<div id="nav"></div>
+</aside>
+
+<main class="main">
+<div class="stats">
+<div class="stat">Current Level<strong id="current">1</strong></div>
+<div class="stat">Completed<strong id="done">0/100</strong></div>
+<div class="stat">XP<strong id="xp">0</strong></div>
+</div>
+
+<p>Overall Progress</p>
+<div class="progress"><div id="bar"></div></div>
+<div id="levels"></div>
+</main>
+</div>
+
+<footer>PROJECT 100 | LIMITLESS MIND</footer>
+
+<script>
+const topics=[
+"Scientific Curiosity","Numbers Around Us","How Memory Works",
+"Mindfulness & Attention","Optical Illusions","Technology Foundations",
+"Money Fundamentals","Communication Skills","Creative Observation",
+"Movement & Coordination","Maps & Our Planet","Everyday Problem Solving",
+"Scientific Method","Fractions & Ratios","Active Recall",
+"Breath & Attention","Pattern Recognition","How the Internet Works",
+"Budgeting Basics","Vocabulary Builder","Physics of Motion",
+"Chemistry Around Us","Biology of Life","Logic & Deduction",
+"Mathematical Thinking","Computer Fundamentals","Personal Finance",
+"Public Speaking","Creative Thinking","Coordination Skills",
+"World Geography","Decision Making","Measurement & Error",
+"Percentages & Applications","Memory Architecture","Focus Training",
+"Probability","Artificial Intelligence","Saving & Planning",
+"Writing Clearly","Energy & Work","Atoms & Molecules",
+"Human Body Systems","Critical Thinking","Algebra Foundations",
+"Digital Safety","Business Fundamentals","Listening Intelligence",
+"Design Thinking","Fitness Science","Climate & Weather",
+"Risk Analysis","Data & Statistics","Geometry","Brain & Learning",
+"Mindfulness Practice","Scientific Experiments","AI & Prompt Skills",
+"Entrepreneurship","Negotiation Basics","Electricity","Chemical Reactions",
+"Genetics","Advanced Logic","Functions & Graphs","Programming Concepts",
+"Financial Decisions","Language Mastery","Problem Design","Sports Science",
+"History of Civilization","Systems Thinking","Research Skills",
+"Probability & Statistics","Trigonometry","Human Psychology",
+"Digital Creation","Marketing Basics","Teamwork","Space & Astronomy",
+"Environmental Science","Scientific Reasoning","Complex Problem Solving",
+"Mathematical Modeling","AI Ethics","Investment Fundamentals",
+"Advanced Communication","Innovation","Human Performance",
+"World Systems","Strategic Thinking","Advanced Research",
+"Mathematics Mastery","Learning Science","Philosophy & Meaning",
+"Technology Innovation","Business Strategy","Leadership & Responsibility",
+"Limitless Scholar Final Challenge"
+];
+
+let data=JSON.parse(localStorage.getItem("p100data"))||{
+completed:[],checks:{},xp:0
+};
+
+function save(){
+localStorage.setItem("p100data",JSON.stringify(data));
+}
+
+function render(){
+const nav=document.getElementById("nav");
+const box=document.getElementById("levels");
+nav.innerHTML="";
+box.innerHTML="";
+
+topics.forEach((topic,i)=>{
+let n=i+1;
+let unlocked=n===1||data.completed.includes(n-1);
+let finished=data.completed.includes(n);
+let checks=data.checks[n]||[false,false,false];
+
+let b=document.createElement("button");
+b.textContent=(finished?"✅":unlocked?"🔓":"🔒")+" Level "+n;
+b.onclick=()=>{
+if(unlocked){
+document.getElementById("L"+n).scrollIntoView({behavior:"smooth"});
+}else{
+alert("Complete the previous level to unlock this level!");
+}
+};
+nav.appendChild(b);
+
+let section=document.createElement("section");
+section.className="level "+(!unlocked?"locked":"");
+section.id="L"+n;
+
+section.innerHTML=`
+<h2>LEVEL ${n} — ${topic}</h2>
+<div class="badge">${finished?"COMPLETED":unlocked?"UNLOCKED":"LOCKED"}</div>
+
+<h3>Introduction</h3>
+<p>Welcome to Level ${n}. Your topic is <b>${topic}</b>.
+Learn its important ideas, explore how it works, connect it to
+real life, and practise thinking independently.</p>
+
+<h3>Your Missions</h3>
+<label class="mission">
+<input type="checkbox" ${checks[0]?"checked":""}
+${(!unlocked||finished)?"disabled":""}
+onchange="tick(${n},0,this.checked)">
+<span>Mission 1: Study and understand the main ideas of ${topic}.</span>
+</label>
+
+<label class="mission">
+<input type="checkbox" ${checks[1]?"checked":""}
+${(!unlocked||finished)?"disabled":""}
+onchange="tick(${n},1,this.checked)">
+<span>Mission 2: Find an example in real life and explain it in your own words.</span>
+</label>
+
+<label class="mission">
+<input type="checkbox" ${checks[2]?"checked":""}
+${(!unlocked||finished)?"disabled":""}
+onchange="tick(${n},2,this.checked)">
+<span>Mission 3: Practise, test yourself, and recall what you learned without looking.</span>
+</label>
+
+<button class="complete"
+${(!unlocked||finished||!checks.every(Boolean))?"disabled":""}
+onclick="finish(${n})">
+${finished?"Level Completed ✓":"Complete Level (+100 XP)"}
+</button>
+`;
+box.appendChild(section);
+});
+stats();
+}
+
+function tick(n,j,v){
+if(!data.checks[n])data.checks[n]=[false,false,false];
+data.checks[n][j]=v;
+save();
+render();
+}
+
+function finish(n){
+if(data.completed.includes(n))return;
+if(n>1&&!data.completed.includes(n-1))return;
+if(!data.checks[n]||!data.checks[n].every(Boolean))return;
+data.completed.push(n);
+data.xp+=100;
+save();
+render();
+alert("Level "+n+" complete! You earned 100 XP!");
+}
+
+function stats(){
+document.getElementById("current").textContent=
+Math.min(data.completed.length+1,100);
+document.getElementById("done").textContent=
+data.completed.length+"/100";
+document.getElementById("xp").textContent=data.xp;
+document.getElementById("bar").style.width=data.completed.length+"%";
+}
+
+render();
+</script>
+</body>
+</html>
